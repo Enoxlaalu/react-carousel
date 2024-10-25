@@ -1,0 +1,28 @@
+.carouselArrow {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px 0px rgba($color: #18191a, $alpha: 0.25);
+    cursor: pointer;
+}
+
+.prev {
+    left: -24px;
+}
+
+.next {
+    right: -24px;
+
+    svg {
+        rotate: 180deg;
+    }
+}
+
+.hidden {
+    display: none;
+}

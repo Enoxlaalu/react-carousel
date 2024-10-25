@@ -1,0 +1,21 @@
+.sliderContainer {
+    position: relative;
+    display: grid;
+    align-items: center;
+}
+
+.innerSlider {
+    display: grid;
+    grid-auto-flow: column;
+    grid-column-gap: 24px;
+    overflow-x: scroll;
+    /* hide scroll bar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* momentum scroll on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* disbable vertical scroll for touch */
+    touch-action: pan-x;
+    /* scroll snapping */
+    scroll-snap-type: x mandatory;
+}
