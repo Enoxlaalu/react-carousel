@@ -7,6 +7,7 @@ import CarouselArrow from './CarouselArrow/CarouselArrow'
 const Carousel: CarouselComponentType = ({ children }) => {
     const list = useRef<HTMLUListElement>(null)
     const [indexes, setIndexes] = useState<number[]>([])
+    const [edgeIndexes, setEdgeIndexes] = useState<number[] | null>(null)
 
     const itemsCount = Children.count(children)
 
@@ -45,7 +46,7 @@ const Carousel: CarouselComponentType = ({ children }) => {
         const observer = new IntersectionObserver(onIntersectionObserved, {
             root: list.current,
             rootMargin: '0px',
-            threshold: 1,
+            threshold: 0,
         })
 
         // observe each item
@@ -59,6 +60,42 @@ const Carousel: CarouselComponentType = ({ children }) => {
             })
     }, [itemsCount])
 
+    useEffect(() => {
+        const items = Array.from(list.current?.children || [])
+
+        if (!items.length) return
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                let arr: number[] = []
+
+                entries.forEach((e) => {
+                    const intersectingIndex = items.indexOf(e.target)
+
+                    if (e.isIntersecting) {
+                        arr = [...arr, intersectingIndex]
+                    } else {
+                        arr = arr.filter((item) => item !== intersectingIndex)
+                    }
+                })
+
+                setEdgeIndexes(arr)
+            },
+            {
+                root: list.current,
+                rootMargin: '0px',
+                threshold: 1,
+            }
+        )
+
+        const arr = [items[0], items[items.length - 1]]
+
+        arr.forEach((el) => observer.observe(el))
+        return () => arr.forEach((el) => observer.unobserve(el))
+    }, [])
+
+    if (!itemsCount) return
+
     const makeScroll = (nextIndex: number) => {
         const items = Array.from(list.current!.children)
 
@@ -70,15 +107,12 @@ const Carousel: CarouselComponentType = ({ children }) => {
     }
 
     const scrollToPrev = () => {
-        const nextIndex = indexes.length > 1 ? indexes[0] : indexes[0] - 1
+        const nextIndex = indexes[0]
 
         makeScroll(nextIndex)
     }
     const scrollToNext = () => {
-        const nextIndex =
-            indexes.length > 1
-                ? indexes[indexes.length - 1]
-                : indexes[indexes.length - 1] + 1
+        const nextIndex = indexes[indexes.length - 1]
 
         makeScroll(nextIndex)
     }
@@ -87,7 +121,7 @@ const Carousel: CarouselComponentType = ({ children }) => {
         <div className={s.sliderContainer}>
             <CarouselArrow
                 onClick={scrollToPrev}
-                hidden={!indexes.length || indexes.includes(0)}
+                hidden={!edgeIndexes || edgeIndexes.includes(0)}
             />
             <ul ref={list} className={s.innerSlider}>
                 {children}
@@ -95,7 +129,7 @@ const Carousel: CarouselComponentType = ({ children }) => {
             <CarouselArrow
                 onClick={scrollToNext}
                 direction="next"
-                hidden={!indexes.length || indexes.includes(itemsCount - 1)}
+                hidden={!edgeIndexes || edgeIndexes.includes(itemsCount - 1)}
             />
         </div>
     )

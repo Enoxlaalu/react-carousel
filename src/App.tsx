@@ -6,11 +6,16 @@ function App() {
     return (
         <div className={s.wrapper}>
             <Carousel>
-                {Array(10)
+                {Array(20)
                     .fill('')
                     .map((item, index) => {
                         return (
-                            <div key={index} className={s.carouselItem}>
+                            <div
+                                key={index}
+                                style={{ width: Math.random() * 100 }}
+                                // style={{ width: 200 }}
+                                className={s.carouselItem}
+                            >
                                 {index}
                             </div>
                         )
